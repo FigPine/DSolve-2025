@@ -1,21 +1,21 @@
 # 🚀 DSolve-2025 Hackathon
 
 ## 👥 Team Information
-**Team Name:** [Your Creative Team Name]  
+**Team Name:** CodeBreakers  
 
 **Team Members:**
-- Member 1 Name
-- [Member 1's Github ](https://github.com/username) - Role/Contribution
-- Member 2 Name
-- [Member 2's Github](https://github.com/username) - Role/Contribution
+- Akshara S.
+- (https://github.com/Akshara23cet) - Role/Contribution
+- Maria Binu Simon
+- (https://github.com/figpine) - Role/Contribution
 
 ## 💡 Project Idea
-[A clear, concise 2-3 sentence description of your project's purpose and value proposition]
+Alternative payment method to using QR code scanning for bus fares - Geofencing bus stations
 
 ## ✨ Key Features
-- 🔍 Feature 1: [Brief description]
-- ⚡ Feature 2: [Brief description] 
-- 🛡️ Feature 3: [Brief description]
+- 🔍 Feature 1: Geofencing
+- ⚡ Feature 2: GPS tracker to track buses 
+- 🛡️ Feature 3: Auto payment
 
 ## 🎥 Product Demo
 [![Watch the Demo](https://via.placeholder.com/300x200?text=Click+for+Demo+Video)](https://youtube.com/link-to-video)
@@ -24,34 +24,42 @@
 ## 🛠️ Tech Stack
 | Technology | Version | Purpose |
 |------------|---------|---------|
-| Tech 1     | vX.X.X  |         |
-| Tech 1     | vX.X.X  |         |
-| Tech 1     | vX.X.X  |         |
+| Tech 1     | v3.13.2 | python  |
+| Tech 2     | v3.1.0  | flask   |
 
 ## 🛠️ Setup Instructions
 
 ### Prerequisites
-- Node.js v16+ / Python 3.8+
-- npm/yarn/pip
-- [Any other requirements]
+- Python 3.8+
+- pip
 
 ### Installation
-```bash
-// {Enter the commands for installation here}
-```
+# Clone the repository
+git clone https://github.com/yourusername/autopay-bus.git
+cd autopay-bus
+
+# Create virtual environment (recommended)
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+venv\Scripts\activate    # Windows
+
+# Install dependencies
+pip install -r requirements.txt
 
 ### Running the Project
-```bash
-// {Enter the commands for running here}
-```
+# Start Flask backend
+python app.py
+
+# Open frontend in browser (separate terminal)
+live-server --port=3000  # Or manually open index.html
 
 ## 🤝 How to Contribute
 We welcome contributions! Here are some ways you can help:
-
-### Good First Issues
-- [ ] Implement feature X
-- [ ] Improve documentation
-- [ ] Fix bug #123
+Good First Issues
+Add voice announcements for bus stops
+Implement dark mode toggle
+Improve fare calculation algorithm
+Add unit tests for backend API
 
 ### Contribution Workflow
 1. Fork the repository
