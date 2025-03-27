@@ -1,0 +1,507 @@
+<!-- 
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ride Tracking</title>
+    //Leaflet CSS/JS 
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        #map { 
+            height: 400px;
+            margin-bottom: 10px;
+        }
+        .ride-controls { 
+            margin: 20px;
+            text-align: center;
+        }
+        #gps-status {
+            color: #d9534f;
+            margin: 10px 0;
+        }
+        #endRideBtn {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #d9534f;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div id="gps-status"></div>
+    <div class="ride-controls">
+        <button id="endRideBtn">End Ride</button>
+    </div>
+
+    <script>
+        // Initialize map with fallback to Bangalore
+        const map = L.map('map').setView([12.9716, 77.5946], 15);
+        
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+
+        // Tracking variables
+        let userMarker;
+        let watchId;
+        let currentRideId;
+        let usingMockData = false;
+
+        // Enhanced GPS tracking with error handling
+        function startTracking(position) {
+            const { latitude, longitude } = position.coords;
+            
+            // Update status
+            document.getElementById('gps-status').textContent = "Live GPS tracking active";
+            document.getElementById('gps-status').style.color = "#5cb85c";
+            
+            // Add/update marker
+            if (!userMarker) {
+                userMarker = L.marker([latitude, longitude]).addTo(map)
+                    .bindPopup("Your current location").openPopup();
+            } else {
+                userMarker.setLatLng([latitude, longitude]);
+            }
+            
+            // Center map
+            map.setView([latitude, longitude], 15);
+            
+            // Continuous tracking
+            watchId = navigator.geolocation.watchPosition(
+                (pos) => {
+                    userMarker.setLatLng([pos.coords.latitude, pos.coords.longitude]);
+                },
+                (err) => {
+                    console.error("GPS Error:", err);
+                    if (!usingMockData) {
+                        alert("Live GPS lost. Switching to demo mode.");
+                        mockRide();
+                    }
+                },
+                { 
+                    enableHighAccuracy: true,
+                    maximumAge: 0,
+                    timeout: 10000 
+                }
+            );
+        }
+
+        // Mock ride data (fallback)
+        function mockRide() {
+            usingMockData = true;
+            document.getElementById('gps-status').textContent = "Demo mode: Showing simulated route";
+            document.getElementById('gps-status').style.color = "#f0ad4e";
+            
+            const mockPositions = [
+                [12.9716, 77.5946],  // MG Road
+                [12.9720, 77.5950],   // 500m NE
+                [12.9725, 77.5955]    // 1km NE
+            ];
+            
+            let i = 0;
+            const interval = setInterval(() => {
+                if (i >= mockPositions.length) {
+                    clearInterval(interval);
+                    return;
+                }
+                
+                const [lat, lng] = mockPositions[i];
+                if (!userMarker) {
+                    userMarker = L.marker([lat, lng]).addTo(map)
+                        .bindPopup("Demo Location");
+                } else {
+                    userMarker.setLatLng([lat, lng]);
+                }
+                map.setView([lat, lng], 15);
+                i++;
+            }, 2000);
+        }
+
+        // Start ride with backend API
+        async function startRide() {
+            try {
+                const position = await new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(resolve, reject, {
+                        enableHighAccuracy: true,
+                        timeout: 5000,
+                        maximumAge: 0
+                    });
+                });
+                
+                const response = await fetch('http://localhost:5000/api/start_ride', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: 1, // Replace with actual user ID from login
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    })
+                });
+                
+                const data = await response.json();
+                currentRideId = data.ride_id;
+                localStorage.setItem('current_ride_id', currentRideId);
+                startTracking(position);
+                
+            } catch (error) {
+                console.error("Start ride failed:", error);
+                alert("Couldn't access your location. Using demo route.");
+                mockRide();
+                
+                // Simulate API call for demo
+                currentRideId = Math.floor(Math.random() * 1000);
+                localStorage.setItem('current_ride_id', currentRideId);
+            }
+        }
+
+        // End ride handler
+        document.getElementById('endRideBtn').addEventListener('click', async () => {
+            try {
+                let lat, lng;
+                
+                if (usingMockData) {
+                    // Use last mock position
+                    lat = 12.9725;
+                    lng = 77.5955;
+                } else {
+                    const position = await new Promise((resolve, reject) => {
+                        navigator.geolocation.getCurrentPosition(resolve, reject);
+                    });
+                    lat = position.coords.latitude;
+                    lng = position.coords.longitude;
+                }
+                
+                const response = await fetch('http://localhost:5000/api/end_ride', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        ride_id: currentRideId,
+                        lat: lat,
+                        lng: lng
+                    })
+                });
+                
+                const data = await response.json();
+                window.location.href = `fare.html?fare=${data.fare}&distance=${data.distance}`;
+                
+            } catch (error) {
+                console.error("End ride failed:", error);
+                // Fallback with demo fare
+                window.location.href = `fare.html?fare=15&distance=1.5`;
+            }
+        });
+
+        // Start ride when page loads
+        startRide();
+    </script>
+</body>
+</html> -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ride Tracking</title>
+    <!-- Leaflet CSS/JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        #map { 
+            height: 400px;
+            margin-bottom: 10px;
+        }
+        .ride-controls { 
+            margin: 20px;
+            text-align: center;
+        }
+        #gps-status {
+            color: #d9534f;
+            margin: 10px 0;
+        }
+        #endRideBtn {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #d9534f;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #geofence-status {
+            padding: 8px;
+            background: #f8f9fa;
+            text-align: center;
+            font-weight: bold;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div id="geofence-status">Not at a bus stop</div>
+    <div id="gps-status"></div>
+    <div class="ride-controls">
+        <button id="endRideBtn">End Ride</button>
+    </div>
+
+    <script>
+        // Initialize map centered at CET Trivandrum (10m accuracy not possible, using 10m)
+        const map = L.map('map').setView([8.5465, 76.9150], 18); // Zoom level 18 for 10m precision
+        
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+
+        // ======================
+        // 1. Geofence Configuration (CET Trivandrum)
+        // ======================
+        const busStops = [
+            {
+                id: "stop1",
+                name: "CET Main Gate",
+                coords: [8.5465, 76.9150], // CET coordinates
+                radius: 10 // 10m radius (minimum practical for GPS)
+            },
+            {
+                id: "stop2",
+                name: "CET Bus Bay",
+                coords: [8.5462, 76.9148], // Nearby location
+                radius: 10
+            }
+        ];
+
+        // Tracking variables
+        let userMarker;
+        let watchId;
+        let currentRideId;
+        let usingMockData = false;
+        let currentGeofence = null;
+        let geofenceCircles = [];
+
+        // ======================
+        // 2. Geofence Logic
+        // ======================
+        function checkGeofence(position) {
+            const { latitude, longitude } = position.coords;
+            
+            busStops.forEach(stop => {
+                const distance = map.distance([latitude, longitude], stop.coords);
+                
+                // Entered geofence (10m radius)
+                if (distance <= stop.radius && currentGeofence !== stop.id) {
+                    currentGeofence = stop.id;
+                    onGeofenceEnter(stop);
+                }
+                
+                // Exited geofence
+                if (distance > stop.radius && currentGeofence === stop.id) {
+                    currentGeofence = null;
+                    onGeofenceExit(stop);
+                }
+            });
+        }
+
+        function onGeofenceEnter(stop) {
+            console.log(`Entered ${stop.name} geofence`);
+            document.getElementById('geofence-status').textContent = `At ${stop.name}`;
+            document.getElementById('geofence-status').style.background = "#e6f7ff";
+            
+            // Visual feedback (blue circle)
+            const circle = L.circle(stop.coords, {
+                radius: stop.radius,
+                color: '#1890ff',
+                fillOpacity: 0.2
+            }).addTo(map).bindPopup(`Bus Stop: ${stop.name}`);
+            geofenceCircles.push(circle);
+            
+            // Auto-start ride if not in one
+            if (!localStorage.getItem('current_ride_id')) {
+                startRideFromGeofence(stop);
+            }
+        }
+
+        function onGeofenceExit(stop) {
+            console.log(`Exited ${stop.name} geofence`);
+            document.getElementById('geofence-status').textContent = "Not at a bus stop";
+            document.getElementById('geofence-status').style.background = "#f8f9fa";
+            
+            // Remove visual feedback
+            geofenceCircles.forEach(circle => circle.remove());
+            geofenceCircles = [];
+        }
+
+        async function startRideFromGeofence(stop) {
+            try {
+                const response = await fetch('http://localhost:5000/api/start_ride', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: 1,
+                        lat: stop.coords[0],
+                        lng: stop.coords[1],
+                        triggered_by: 'geofence'
+                    })
+                });
+                
+                const data = await response.json();
+                currentRideId = data.ride_id;
+                localStorage.setItem('current_ride_id', currentRideId);
+                
+            } catch (error) {
+                console.error("Geofence start failed:", error);
+            }
+        }
+
+        // ======================
+        // 3. Tracking (CET-specific mock data)
+        // ======================
+        function startTracking(position) {
+            const { latitude, longitude } = position.coords;
+            
+            document.getElementById('gps-status').textContent = "Live GPS tracking active";
+            document.getElementById('gps-status').style.color = "#5cb85c";
+            
+            if (!userMarker) {
+                userMarker = L.marker([latitude, longitude]).addTo(map)
+                    .bindPopup("Your location").openPopup();
+            } else {
+                userMarker.setLatLng([latitude, longitude]);
+            }
+            
+            map.setView([latitude, longitude], 18); // Higher zoom for 10m precision
+            
+            watchId = navigator.geolocation.watchPosition(
+                (pos) => {
+                    userMarker.setLatLng([pos.coords.latitude, pos.coords.longitude]);
+                    checkGeofence(pos);
+                },
+                (err) => {
+                    console.error("GPS Error:", err);
+                    if (!usingMockData) {
+                        alert("Live GPS lost. Using demo route near CET.");
+                        mockRide();
+                    }
+                },
+                { 
+                    enableHighAccuracy: true,
+                    maximumAge: 0,
+                    timeout: 10000 
+                }
+            );
+        }
+
+        // Mock route near CET (10m movements)
+        function mockRide() {
+            usingMockData = true;
+            document.getElementById('gps-status').textContent = "Demo: CET Trivandrum Route";
+            document.getElementById('gps-status').style.color = "#f0ad4e";
+            
+            const mockPositions = [
+                [8.5465, 76.9150],  // CET Main Gate
+                [8.5463, 76.9149],  // 20m SE
+                [8.5460, 76.9147]   // CET Bus Bay (~50m)
+            ];
+            
+            let i = 0;
+            const interval = setInterval(() => {
+                if (i >= mockPositions.length) {
+                    clearInterval(interval);
+                    return;
+                }
+                
+                const [lat, lng] = mockPositions[i];
+                if (!userMarker) {
+                    userMarker = L.marker([lat, lng]).addTo(map)
+                        .bindPopup("Demo Location");
+                } else {
+                    userMarker.setLatLng([lat, lng]);
+                }
+                map.setView([lat, lng], 18);
+                
+                // Simulate geofence entry
+                if (i === 0) checkGeofence({ coords: { latitude: lat, longitude: lng } });
+                i++;
+            }, 2000);
+        }
+
+        // Start/End ride handlers (unchanged except coordinates)
+        async function startRide() {
+            try {
+                const position = await new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(resolve, reject, {
+                        enableHighAccuracy: true,
+                        timeout: 5000,
+                        maximumAge: 0
+                    });
+                });
+                
+                const response = await fetch('http://localhost:5000/api/start_ride', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: 1,
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    })
+                });
+                
+                const data = await response.json();
+                currentRideId = data.ride_id;
+                localStorage.setItem('current_ride_id', currentRideId);
+                startTracking(position);
+                
+            } catch (error) {
+                console.error("Start ride failed:", error);
+                alert("Using demo route near CET.");
+                mockRide();
+                currentRideId = Math.floor(Math.random() * 1000);
+                localStorage.setItem('current_ride_id', currentRideId);
+            }
+        }
+
+        document.getElementById('endRideBtn').addEventListener('click', async () => {
+            try {
+                let lat, lng;
+                
+                if (usingMockData) {
+                    // Use last mock position (CET Bus Bay)
+                    lat = 8.5460;
+                    lng = 76.9147;
+                } else {
+                    const position = await new Promise((resolve, reject) => {
+                        navigator.geolocation.getCurrentPosition(resolve, reject);
+                    });
+                    lat = position.coords.latitude;
+                    lng = position.coords.longitude;
+                }
+                
+                const response = await fetch('http://localhost:5000/api/end_ride', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        ride_id: currentRideId,
+                        lat: lat,
+                        lng: lng
+                    })
+                });
+                
+                const data = await response.json();
+                window.location.href = `/fare?fare=${data.fare}&distance=${data.distance}`;
+                
+            } catch (error) {
+                console.error("End ride failed:", error);
+                window.location.href = `/fare?fare=15&distance=0.5`; // Shorter distance for CET
+            }
+        });
+
+        // Start on load
+        startRide();
+    </script>
+</body>
+</html>

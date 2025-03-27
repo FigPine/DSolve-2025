@@ -1,0 +1,924 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoPay Bus - Ride in Progress</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .header {
+            background-color: #3498db;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        .map-container {
+            height: 300px;
+            background-color: #ddd;
+            margin: 1rem;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        .map-placeholder {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .ride-info {
+            background: white;
+            margin: 1rem;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .ride-info h2 {
+            margin: 0 0 1rem;
+            color: #2c3e50;
+        }
+        .ride-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #3498db;
+        }
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        .end-ride-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            width: calc(100% - 2rem);
+            margin: 1rem;
+            cursor: pointer;
+        }
+        .end-ride-btn:hover {
+            background-color: #c0392b;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+        }
+        .modal-btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .modal-btn.confirm {
+            background-color: #27ae60;
+            color: white;
+        }
+        .modal-btn.cancel {
+            background-color: #e74c3c;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Ride in Progress</h1>
+    </div>
+
+    <div class="map-container">
+        <img src="https://maps.googleapis.com/maps/api/staticmap?center=12.9716,77.5946&zoom=15&size=600x300&maptype=roadmap&markers=color:red%7C12.9716,77.5946&key=YOUR_API_KEY" alt="Map" class="map-placeholder">
+    </div>
+
+    <div class="ride-info">
+        <h2>Current Ride</h2>
+        <div class="ride-stats">
+            <div class="stat-item">
+                <div class="stat-value">12:45 PM</div>
+                <div class="stat-label">Start Time</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">2.5 km</div>
+                <div class="stat-label">Distance</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">₹15</div>
+                <div class="stat-label">Est. Fare</div>
+            </div>
+        </div>
+    </div>
+
+    <button class="end-ride-btn" onclick="showEndRideModal()">End Ride</button>
+
+    <div id="endRideModal" class="modal">
+        <div class="modal-content">
+            <h2>End Your Ride?</h2>
+            <p>You've arrived at your destination. Confirm to end your ride and proceed to payment.</p>
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" onclick="hideEndRideModal()">No</button>
+                <button class="modal-btn confirm" onclick="endRide()">Yes, End Ride</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showEndRideModal() {
+            document.getElementById('endRideModal').style.display = 'flex';
+        }
+
+        function hideEndRideModal() {
+            document.getElementById('endRideModal').style.display = 'none';
+        }
+
+        function endRide() {
+            window.location.href = "fare.html";
+        }
+
+        // Simulate geofence trigger (for demo purposes)
+        setTimeout(() => {
+            showEndRideModal();
+        }, 5000);
+    </script>
+</body>
+</html> -->
+
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoPay Bus - Ride in Progress</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .header {
+            background-color: #3498db;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        .map-container {
+            height: 300px;
+            margin: 1rem;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            background: #f0f8ff; /* Light blue background for "map" */
+        }
+        #svgMap {
+            width: 100%;
+            height: 100%;
+        }
+        .ride-info {
+            background: white;
+            margin: 1rem;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .ride-info h2 {
+            margin: 0 0 1rem;
+            color: #2c3e50;
+        }
+        .ride-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #3498db;
+        }
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        .end-ride-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            width: calc(100% - 2rem);
+            margin: 1rem;
+            cursor: pointer;
+        }
+        .end-ride-btn:hover {
+            background-color: #c0392b;
+        }
+        .current-stop {
+            background: #2ecc71;
+            color: white;
+            padding: 0.8rem;
+            margin: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+        }
+        .modal-btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .modal-btn.confirm {
+            background-color: #27ae60;
+            color: white;
+        }
+        .modal-btn.cancel {
+            background-color: #e74c3c;
+            color: white;
+        }
+        /* Bus dot animation */
+        @keyframes moveBus {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(calc(100% - 20px)); }
+        }
+        #busDot {
+            animation: moveBus 15s linear infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Ride in Progress</h1>
+    </div>
+
+    <div class="current-stop" id="currentStop">
+        Next Stop: MG Road (2 min)
+    </div>
+
+    <div class="map-container">
+        <svg id="svgMap" viewBox="0 0 500 150">
+            //Background "streets"
+            <path d="M50,50 L450,50" stroke="#aaa" stroke-width="8" stroke-linecap="round" stroke-dasharray="10,5"/>
+            <path d="M100,100 L400,100" stroke="#aaa" stroke-width="8" stroke-linecap="round" stroke-dasharray="10,5"/>
+            
+            // Bus route (blue path) 
+            <path id="routePath" d="M20,50 L150,50 L200,100 L350,100 L450,50" 
+                  stroke="#3498db" stroke-width="4" fill="none"/>
+            
+            // Bus stops (circles with labels) 
+            <circle cx="20" cy="50" r="6" fill="#2ecc71"/>
+            <text x="20" y="40" text-anchor="middle" font-size="10">Start</text>
+            
+            <circle cx="150" cy="50" r="6" fill="#e74c3c"/>
+            <text x="150" y="40" text-anchor="middle" font-size="10">MG Road</text>
+            
+            <circle cx="350" cy="100" r="6" fill="#e74c3c"/>
+            <text x="350" y="90" text-anchor="middle" font-size="10">Central Mall</text>
+            
+            // Moving bus (red dot) 
+            <circle id="busDot" cx="20" cy="50" r="8" fill="#e74c3c">
+                <animateMotion dur="15s" repeatCount="indefinite">
+                    <mpath xlink:href="#routePath"/>
+                </animateMotion>
+            </circle>
+        </svg>
+    </div>
+
+    <div class="ride-info">
+        <h2>Current Ride</h2>
+        <div class="ride-stats">
+            <div class="stat-item">
+                <div class="stat-value" id="startTime">12:45 PM</div>
+                <div class="stat-label">Start Time</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="distance">0.5 km</div>
+                <div class="stat-label">Distance</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="fare">₹8</div>
+                <div class="stat-label">Est. Fare</div>
+            </div>
+        </div>
+    </div>
+
+    <button class="end-ride-btn" onclick="showEndRideModal()">End Ride</button>
+
+    <div id="endRideModal" class="modal">
+        <div class="modal-content">
+            <h2>End Your Ride?</h2>
+            <p>You've arrived at <span id="arrivalStop">Central Mall</span>. Confirm to end your ride.</p>
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" onclick="hideEndRideModal()">No</button>
+                <button class="modal-btn confirm" onclick="endRide()">Yes, End Ride</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simulated bus route data
+        const stops = [
+            { name: "Start", distance: 0, fare: 0, time: 0 },
+            { name: "MG Road", distance: 1.2, fare: 8, time: 3 },
+            { name: "Central Mall", distance: 2.5, fare: 15, time: 8 }
+        ];
+        
+        let currentStopIndex = 1; // Start at first real stop
+        
+        function updateRideStats() {
+            document.getElementById('distance').textContent = `${stops[currentStopIndex].distance.toFixed(1)} km`;
+            document.getElementById('fare').textContent = `₹${stops[currentStopIndex].fare}`;
+            document.getElementById('currentStop').textContent = 
+                `Next Stop: ${stops[currentStopIndex].name} (${stops[currentStopIndex].time} min)`;
+            
+            // Announce stop (Web Speech API)
+            if ('speechSynthesis' in window) {
+                const speech = new SpeechSynthesisUtterance(
+                    `Now arriving at ${stops[currentStopIndex].name}`
+                );
+                window.speechSynthesis.speak(speech);
+            }
+        }
+
+        function rotateStops() {
+            currentStopIndex = (currentStopIndex + 1) % stops.length;
+            updateRideStats();
+            
+            // Auto-show modal at last stop
+            if (currentStopIndex === stops.length - 1) {
+                document.getElementById('arrivalStop').textContent = stops[currentStopIndex].name;
+                setTimeout(showEndRideModal, 3000);
+            }
+        }
+
+        // Update stats every 5 seconds (simulate movement)
+        updateRideStats();
+        setInterval(rotateStops, 5000);
+
+        // Modal functions
+        function showEndRideModal() {
+            document.getElementById('endRideModal').style.display = 'flex';
+        }
+
+        function hideEndRideModal() {
+            document.getElementById('endRideModal').style.display = 'none';
+        }
+
+        function endRide() {
+            window.location.href = "fare.html";
+        }
+    </script>
+</body>
+</html> -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoPay Bus - Ride in Progress</title>
+    <style>
+        :root {
+            --primary: #3498db;
+            --secondary: #2ecc71;
+            --danger: #e74c3c;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+        }
+        .header {
+            background: linear-gradient(135deg, var(--primary), #2980b9);
+            color: white;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        .demo-banner {
+            background: linear-gradient(90deg, #f39c12, #e67e22);
+            color: white;
+            padding: 0.7rem;
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            animation: pulse 2s infinite;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.9; }
+            50% { opacity: 1; }
+        }
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background-color: #ecf0f1;
+            position: relative;
+            margin: 1rem 0;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--secondary), #27ae60);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 4px;
+        }
+        .map-container {
+            height: 250px;
+            margin: 1rem;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        #liveMap {
+            width: 100%;
+            height: 100%;
+            background: #eaf2f8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .bus-marker {
+            position: absolute;
+            font-size: 28px;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            transition: all 1s linear;
+        }
+        .bus-stop {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: var(--danger);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px var(--danger);
+        }
+        .stop-label {
+            position: absolute;
+            font-size: 12px;
+            background: white;
+            padding: 2px 6px;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transform: translate(-50%, 10px);
+            white-space: nowrap;
+        }
+        .route-line {
+            position: absolute;
+            height: 4px;
+            background: var(--primary);
+            transform-origin: left center;
+        }
+        .ride-info {
+            background: white;
+            margin: 1rem;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+            animation: fadeIn 0.6s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .stat-card {
+            background: var(--light);
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--dark);
+            margin: 0.3rem 0;
+        }
+        .stat-label {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+        }
+        .action-btn {
+            background: linear-gradient(135deg, var(--danger), #c0392b);
+            color: white;
+            border: none;
+            padding: 1.2rem;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            width: calc(100% - 2rem);
+            margin: 1.5rem 1rem 1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+            transition: all 0.3s;
+        }
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(231, 76, 60, 0.4);
+        }
+        .action-btn:active {
+            transform: translateY(0);
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .modal-content {
+            background: white;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        .modal-btn {
+            flex: 1;
+            padding: 0.8rem;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-cancel {
+            background: #ecf0f1;
+            color: #7f8c8d;
+            border: none;
+        }
+        .btn-confirm {
+            background: linear-gradient(135deg, var(--secondary), #27ae60);
+            color: white;
+            border: none;
+            box-shadow: 0 2px 5px rgba(46, 204, 113, 0.3);
+        }
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--dark);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .notification.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Ride in Progress</h1>
+        <div class="progress-container">
+            <div class="progress-bar" id="rideProgress"></div>
+        </div>
+    </div>
+
+    <div id="demoBanner" class="demo-banner">
+        🚌 DEMO MODE: Simulated ride at 2x speed
+    </div>
+
+    <div class="map-container">
+        <div id="liveMap">
+            <!-- Dynamic elements will be added by JavaScript -->
+        </div>
+    </div>
+
+    <div class="ride-info">
+        <h2 style="color: var(--dark); margin-bottom: 1.5rem;">Your Journey</h2>
+        <div id="currentStop" style="background: var(--secondary); color: white; padding: 0.8rem; border-radius: 8px; text-align: center; margin-bottom: 1.5rem; font-weight: bold;">
+            Approaching: MG Road Station
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Distance Traveled</div>
+                <div class="stat-value" id="distance">0.5 km</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Duration</div>
+                <div class="stat-value" id="duration">3 min</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Estimated Fare</div>
+                <div class="stat-value" id="fare">₹8</div>
+            </div>
+        </div>
+    </div>
+
+    <button class="action-btn" id="endRideBtn">
+        END RIDE
+    </button>
+
+    <div class="modal-overlay" id="endRideModal">
+        <div class="modal-content">
+            <h2 style="color: var(--dark); margin-top: 0;">Complete Your Ride?</h2>
+            <p>You're arriving at <strong id="arrivalStop">Central Mall Station</strong>.</p>
+            <p>Final fare: <strong id="finalFare" style="color: var(--secondary); font-size: 1.2rem;">₹15.00</strong></p>
+            
+            <div class="modal-buttons">
+                <button class="modal-btn btn-cancel" id="cancelBtn">Cancel</button>
+                <button class="modal-btn btn-confirm" id="confirmBtn">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification">
+        Ride completed successfully!
+    </div>
+
+    <script>
+        // Configuration
+        const config = {
+            demoMode: true,
+            stops: [
+                { name: "Start Point", distance: 0, fare: 0, time: 0, position: 0 },
+                { name: "MG Road Station", distance: 1.2, fare: 8, time: 3, position: 0.4 },
+                { name: "Central Mall Station", distance: 2.5, fare: 15, time: 8, position: 1 }
+            ],
+            rideDuration: 30000, // 30 seconds total for demo
+            animationInterval: 50 // ms between animation frames
+        };
+
+        // State management
+        const state = {
+            currentStopIndex: 0,
+            startTime: new Date(),
+            animationFrame: null,
+            progress: 0
+        };
+
+        // DOM Elements
+        const elements = {
+            liveMap: document.getElementById('liveMap'),
+            rideProgress: document.getElementById('rideProgress'),
+            currentStop: document.getElementById('currentStop'),
+            distance: document.getElementById('distance'),
+            duration: document.getElementById('duration'),
+            fare: document.getElementById('fare'),
+            endRideBtn: document.getElementById('endRideBtn'),
+            endRideModal: document.getElementById('endRideModal'),
+            arrivalStop: document.getElementById('arrivalStop'),
+            finalFare: document.getElementById('finalFare'),
+            cancelBtn: document.getElementById('cancelBtn'),
+            confirmBtn: document.getElementById('confirmBtn'),
+            notification: document.getElementById('notification'),
+            demoBanner: document.getElementById('demoBanner')
+        };
+
+        // Initialize the map with stops
+        function initMap() {
+            // Clear any existing elements
+            elements.liveMap.innerHTML = '';
+            
+            // Create route line
+            const routeLine = document.createElement('div');
+            routeLine.className = 'route-line';
+            routeLine.style.width = '0%';
+            elements.liveMap.appendChild(routeLine);
+            
+            // Create stops
+            config.stops.forEach((stop, index) => {
+                const stopElement = document.createElement('div');
+                stopElement.className = 'bus-stop';
+                stopElement.style.left = `${stop.position * 100}%`;
+                stopElement.style.top = `${50 - (index % 2) * 20}%`;
+                elements.liveMap.appendChild(stopElement);
+                
+                const label = document.createElement('div');
+                label.className = 'stop-label';
+                label.textContent = stop.name;
+                label.style.left = `${stop.position * 100}%`;
+                label.style.top = `${50 - (index % 2) * 20}%`;
+                elements.liveMap.appendChild(label);
+            });
+            
+            // Create bus marker
+            const bus = document.createElement('div');
+            bus.className = 'bus-marker';
+            bus.innerHTML = '🚌';
+            bus.id = 'busMarker';
+            bus.style.left = '0%';
+            bus.style.top = '50%';
+            elements.liveMap.appendChild(bus);
+        }
+
+        // Update ride statistics
+        function updateStats() {
+            const currentStop = config.stops[state.currentStopIndex];
+            const elapsedTime = (new Date() - state.startTime) / 1000 / 60; // in minutes
+            
+            elements.distance.textContent = `${currentStop.distance.toFixed(1)} km`;
+            elements.duration.textContent = `${Math.floor(elapsedTime)} min`;
+            elements.fare.textContent = `₹${currentStop.fare}`;
+            elements.currentStop.textContent = `Approaching: ${currentStop.name}`;
+            
+            // Update progress bar
+            elements.rideProgress.style.width = `${state.progress * 100}%`;
+            
+            // Update bus position
+            document.getElementById('busMarker').style.left = `${state.progress * 100}%`;
+            
+            // Update route line
+            document.querySelector('.route-line').style.width = `${state.progress * 100}%`;
+        }
+
+        // Animate the ride progression
+        function animateRide() {
+            const startTime = Date.now();
+            const duration = config.rideDuration;
+            
+            function frame() {
+                const elapsed = Date.now() - startTime;
+                state.progress = Math.min(elapsed / duration, 1);
+                
+                // Check if we've reached a new stop
+                const nextStopIndex = Math.floor(state.progress * (config.stops.length - 1));
+                if (nextStopIndex > state.currentStopIndex) {
+                    state.currentStopIndex = nextStopIndex;
+                    announceStop(config.stops[state.currentStopIndex].name);
+                }
+                
+                updateStats();
+                
+                if (state.progress < 1) {
+                    state.animationFrame = requestAnimationFrame(frame);
+                } else {
+                    completeRide();
+                }
+            }
+            
+            frame();
+        }
+
+        // Announce stops with voice and visual notification
+        function announceStop(stopName) {
+            // Visual notification
+            elements.notification.textContent = `Now arriving at ${stopName}`;
+            elements.notification.classList.add('show');
+            setTimeout(() => {
+                elements.notification.classList.remove('show');
+            }, 3000);
+            
+            // Voice announcement
+            if ('speechSynthesis' in window && state.currentStopIndex > 0) {
+                const utterance = new SpeechSynthesisUtterance(`Now arriving at ${stopName}`);
+                utterance.rate = 1.2;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        // Complete the ride automatically
+        function completeRide() {
+            state.currentStopIndex = config.stops.length - 1;
+            updateStats();
+            showModal();
+        }
+
+        // Show confirmation modal
+        function showModal() {
+            const finalStop = config.stops[config.stops.length - 1];
+            elements.arrivalStop.textContent = finalStop.name;
+            elements.finalFare.textContent = `₹${finalStop.fare}.00`;
+            elements.endRideModal.classList.add('active');
+        }
+
+        // Hide confirmation modal
+        function hideModal() {
+            elements.endRideModal.classList.remove('active');
+        }
+
+        // End the ride and proceed to fare page
+        function endRide() {
+            hideModal();
+            elements.notification.textContent = "Processing your ride...";
+            elements.notification.classList.add('show');
+            
+            setTimeout(() => {
+                window.location.href = "fare.html";
+            }, 1500);
+        }
+
+        // Event listeners
+        elements.endRideBtn.addEventListener('click', showModal);
+        elements.cancelBtn.addEventListener('click', hideModal);
+        elements.confirmBtn.addEventListener('click', endRide);
+
+        // Initialize
+        if (config.demoMode) {
+            elements.demoBanner.style.display = 'block';
+        } else {
+            elements.demoBanner.style.display = 'none';
+        }
+
+        initMap();
+        animateRide();
+        updateStats();
+    </script>
+</body>
+</html>

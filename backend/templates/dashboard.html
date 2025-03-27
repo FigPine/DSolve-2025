@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bus Pay - Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .header {
+            background-color: #3498db;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        .profile-card {
+            background: white;
+            margin: 1rem;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .profile-pic {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #ddd;
+            margin-right: 1rem;
+            overflow: hidden;
+        }
+        .profile-pic img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .profile-info h2 {
+            margin: 0;
+            color: #2c3e50;
+        }
+        .profile-info p {
+            margin: 0.2rem 0 0;
+            color: #7f8c8d;
+        }
+        .wallet-balance {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+        .wallet-balance h3 {
+            margin: 0 0 0.5rem;
+            color: #2c3e50;
+        }
+        .balance-amount {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #27ae60;
+        }
+        .start-ride-btn {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            width: calc(100% - 2rem);
+            margin: 1rem;
+            cursor: pointer;
+        }
+        .start-ride-btn:hover {
+            background-color: #219653;
+        }
+        .nav {
+            display: flex;
+            justify-content: space-around;
+            background: white;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            padding: 0.8rem 0;
+            box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
+        }
+        .nav-item {
+            text-align: center;
+            color: #7f8c8d;
+        }
+        .nav-item.active {
+            color: #3498db;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>AutoPay Bus</h1>
+    </div>
+
+    <div class="profile-card">
+        <div class="profile-header">
+            <div class="profile-pic">
+                <img src="https://via.placeholder.com/60" alt="Profile Picture">
+            </div>
+            <div class="profile-info">
+                <h2>Sanjay</h2>
+                <p>sanjay@example.com</p>
+            </div>
+        </div>
+        <div class="wallet-balance">
+            <h3>Wallet Balance</h3>
+            <div class="balance-amount">₹250.00</div>
+        </div>
+    </div>
+
+    <button class="start-ride-btn" onclick="startRide()">Start Ride</button>
+
+    <div class="nav">
+        <div class="nav-item active">🏠 Home</div>
+        <div class="nav-item">📊 Trips</div>
+        <div class="nav-item">⚙️ Settings</div>
+    </div>
+
+    <script>
+        function startRide() {
+            // In a real app, we would check location permissions here
+            window.location.href = "/gps";
+        }
+    </script>
+</body>
+</html>
